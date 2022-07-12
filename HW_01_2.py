@@ -24,9 +24,14 @@
 
 
 class Meta(type):
-    def __new__(cls, name, base, attrs):
-        attrs.update({'class_number': 0})
-        return type.__new__(cls, name, base, attrs)
+    children_number = 0
+
+    def __new__(cls, *args, **kwargs):
+        print(cls, "__new__ CountingClass called")
+        instance = super().__new__(cls, *args, **kwargs)
+        instance.class_number = cls.children_number
+        cls.children_number = cls.children_number + 1
+        return instance
 
 
 Meta.children_number = 0
@@ -42,9 +47,6 @@ class Cls2(metaclass=Meta):
         self.data = data
 
 
-print(Cls1.class_number)
-print(Cls2.class_number)
-print(Cls2.class_number)
-# assert (Cls1.class_number, Cls2.class_number) == (0, 1)
-# a, b = Cls1(''), Cls2('')
-# assert (a.class_number, b.class_number) == (0, 1)
+assert (Cls1.class_number, Cls2.class_number) == (0, 1)
+a, b = Cls1(''), Cls2('')
+assert (a.class_number, b.class_number) == (0, 1)
